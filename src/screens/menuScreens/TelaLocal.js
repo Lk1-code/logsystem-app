@@ -47,17 +47,22 @@ function TelaLocal({ route }) {
       <View style={styles.container}>
           <Text style={styles.title}>Local: {local}</Text>     
       </View>
-      {localData.map(item => (
-        <View>
-          <Text style={styles.product}>Item:</Text>
-          <View style={styles.items} key={item.id} >
-            <Text style={styles.Textitem}>Id_Produto: {item.id}</Text>
-            <Text style={styles.Textitem}>Produto:{item.Produto}</Text>
-            <Text style={styles.Textitem}>Quantidade: {item.quantidade}</Text>
-            <Text style={styles.Textitem}>EAN: {item.ean}</Text>
-          </View>
+      <View>
+        <View style={styles.linha}>
+          <Text style={styles.coluna_id}>ID</Text>
+          <Text style={styles.coluna_produto}>Produto</Text>
+          <Text style={styles.coluna_quantidade}>Qtd</Text>
+          <Text style={styles.coluna_ean}>Ean</Text>
         </View>
-      ))}
+        {localData.map(item => (
+          <View style={styles.linha}>
+          <Text style={styles.coluna_id}>{item.id} </Text>
+          <Text style={styles.coluna_produto}>{item.Produto}</Text>
+          <Text style={styles.coluna_quantidade}>{item.quantidade}</Text>
+          <Text style={styles.coluna_ean}>{item.ean}</Text>
+        </View>
+        ))}
+      </View>
     </View>
     
   );
@@ -75,26 +80,57 @@ function TelaLocal({ route }) {
       color:'black',
       fontWeight:'bold',
     },
-    product:{
-      margin:10,
-      fontSize:17,
-      color:'black',
+    linha:{
+      fontSize:10,
+      width:400,
+      flexDirection:'row',
+      paddingLeft:5,
+    },
+    coluna_id:{
+      paddingTop:10,
+      height:50,
+      width:40,
+      justifyContent: 'center',
+      textAlign:'center',
       fontWeight:'bold',
-    },
-    Textitem: {
-      margin:5,
-      fontSize: 16,
-      lineHeight: 21,
-      letterSpacing: 0.25,
-      color: '#000000',
-    },
-    items:{
-      margin:20,
-      borderRadius:10,
-      backgroundColor:'#b2eff7',
+      color:'black',
       borderWidth: 1,
-      fontSize: 20,
-      marginBottom: 10,
+      borderColor: 'black',
+      
+    },
+    coluna_produto:{
+      paddingTop:10,
+      height:50,
+      width:220,
+      justifyContent: 'center',
+      textAlign:'center',
+      fontWeight:'bold',
+      color:'black',
+      borderWidth: 1,
+      borderColor: 'black',
+
+    },
+    coluna_quantidade:{
+      paddingTop:10,
+      height:50,
+      width:30,
+      justifyContent: 'center',
+      textAlign:'center',
+      fontWeight:'bold',
+      color:'black',
+      borderWidth: 1,
+      borderColor: 'black',
+    },
+    coluna_ean:{
+      paddingTop:10,
+      height:50,
+      width:90,
+      justifyContent: 'center',
+      textAlign:'center',
+      fontWeight:'bold',
+      color:'black',
+      borderWidth: 1,
+      borderColor: 'black',
     }
   
   });
