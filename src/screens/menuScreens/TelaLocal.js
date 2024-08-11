@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { Text, View, StyleSheet, Image, TextInput, Pressable, Alert} from 'react-native'
 import firestore from '@react-native-firebase/firestore';
 
 function TelaLocal({ route }) {
@@ -42,16 +42,61 @@ function TelaLocal({ route }) {
   }
 
   return (
+    
     <View>
+      <View style={styles.container}>
+          <Text style={styles.title}>Local: {local}</Text>     
+      </View>
       {localData.map(item => (
-        <View key={item.id}>
-          <Text>ID do item: {item.id}</Text>
-          <Text>Descrição: {item.Produto}</Text>
-          <Text>Quantidade: {item.quantidade}</Text>
+        <View>
+          <Text style={styles.product}>Item:</Text>
+          <View style={styles.items} key={item.id} >
+            <Text style={styles.Textitem}>Id_Produto: {item.id}</Text>
+            <Text style={styles.Textitem}>Produto:{item.Produto}</Text>
+            <Text style={styles.Textitem}>Quantidade: {item.quantidade}</Text>
+            <Text style={styles.Textitem}>EAN: {item.ean}</Text>
+          </View>
         </View>
       ))}
     </View>
+    
   );
 }
+  const styles = StyleSheet.create({
+    container: {
+      margin:30,
+      backgroundColor: '#f0f0f0',
+      justifyContent: 'center',
+      alignItems: 'center',
+      
+    },
+    title: {
+      fontSize: 24,
+      color:'black',
+      fontWeight:'bold',
+    },
+    product:{
+      margin:10,
+      fontSize:17,
+      color:'black',
+      fontWeight:'bold',
+    },
+    Textitem: {
+      margin:5,
+      fontSize: 16,
+      lineHeight: 21,
+      letterSpacing: 0.25,
+      color: '#000000',
+    },
+    items:{
+      margin:20,
+      borderRadius:10,
+      backgroundColor:'#b2eff7',
+      borderWidth: 1,
+      fontSize: 20,
+      marginBottom: 10,
+    }
+  
+  });
 
 export default TelaLocal;
