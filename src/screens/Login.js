@@ -13,7 +13,13 @@ function Login({navigation}){
   
 
   const handleLogin = () => {
-    auth().signInWithEmailAndPassword(email, Password)
+    //Verifica caso os campos estejam vazios
+    if (email === ""){
+      Alert.alert("Insira seu email de Usuario!");
+    }else if(Password === ""){
+      Alert.alert("Insira sua Senha!");
+    }else{  
+      auth().signInWithEmailAndPassword(email, Password)
       //Caso o Login e a senha estejam corretos
       .then(() => {
         console.log('Usuário logado com sucesso! ');
@@ -24,6 +30,7 @@ function Login({navigation}){
         console.log(error);
         Alert.alert('Usuario e/ou senha invalido!!')
       });
+        }        
     }
   return (
     <View style={styles.container}>

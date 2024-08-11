@@ -3,19 +3,17 @@ import firestore from '@react-native-firebase/firestore';
 import { useEffect, useState} from 'react';
 
 
-
 function ConsultarLocal({navigation}){
-  const [localOrigem,setLocal] = useState('');
+  const [LocalCons,setLocal] = useState('');
   //faz a verificação se o local existe
-  async function  ConsLocal(){  
-    const localData = await firestore().collection('Estoque').doc(localOrigem).get();
-    //se o local existir então navega para tela do Local
+  async function ConsLocal(){  
+    const localData = await firestore().collection('Estoque').doc(LocalCons).get();
+    //se o local existir então navega para tela do Local e salva a informação do local para
     if(localData.data() !== undefined){
-      console.log(localData.data());
-      navigation.navigate("Tela Local")
+      navigation.navigate("Tela Local",{local: LocalCons});
     //caso o contrario exibe essa mensagem de erro
     }else{
-      Alert.alert('Local invalido')
+      Alert.alert('Local invalido');
     }
     
   }
@@ -30,7 +28,7 @@ function ConsultarLocal({navigation}){
     <View style = {styles.forms}>  
       <Text style={styles.inputText}>Local de Origem</Text>
       <TextInput
-        value={localOrigem}
+        value={LocalCons}
         style={styles.input}
         onChangeText={(text) => setLocal(text)}
       />
@@ -38,6 +36,7 @@ function ConsultarLocal({navigation}){
     <Pressable style={styles.button} onPress={ConsLocal}>
       <Text style={styles.text}>Iniciar Armazenagem</Text>
     </Pressable>
+
   </View>
     )
 }
