@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "809723194078",
+    "firebase_url": "https://logsystem-d3671-default-rtdb.firebaseio.com",
+    "project_id": "logsystem-d3671",
+    "storage_bucket": "logsystem-d3671.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809723194078:android:e9dc8e10899882953e704f",
+        "android_client_info": {
+          "package_name": "com.logsytem"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxiypJsIESM18CnFAwQ0XOO1jSLqKb91Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
