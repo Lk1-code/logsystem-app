@@ -10,6 +10,7 @@ import Expedicao from './screens/menuScreens/Expedicao';
 import Separacao from './screens/menuScreens/Separacao';
 import ConsultarLocal from './screens/menuScreens/ConsultarLocal';
 import TelaLocal from './screens/menuScreens/TelaLocal';
+import TransferenciaLocal from './screens/menuScreens/TransferenciaLocal';
 
 
 const Stack = createNativeStackNavigator();
@@ -74,6 +75,13 @@ const App = () => {
       <Stack.Screen
         name="Separação"
         component={Separacao}
+        options={{
+          title: 'Separação',
+        }}
+      />
+      <Stack.Screen
+        name="Transferencia"
+        component={TransferenciaLocal}
         options={{
           title: 'Separação',
         }}

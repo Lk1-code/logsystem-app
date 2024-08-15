@@ -2,28 +2,21 @@ import { Text, View, StyleSheet, Image, TextInput, Pressable, Alert} from 'react
 import firestore from '@react-native-firebase/firestore';
 import { useEffect, useState} from 'react';
 
-function Armazenagem({navigation}){
+function TransferenciaLocal({navigation}){
   const [LocalOrg,setLocalOrigem] = useState('');
   const [Localdes,setLocalDest] = useState('');
   async function armaLocal(){  
     const localDataOrg = await firestore().collection('Estoque').doc(LocalOrg).get();
     const localDataDes = await firestore().collection('Estoque').doc(Localdes).get();
     //se o local existir então navega para tela do Local e salva a informação do local para
-    if(LocalOrg !== '' || Localdes !== ''){
-      if(localDataDes.data() !== undefined && localDataOrg.data() !==undefined){
-        if(LocalOrg == Localdes){
-          Alert.alert('O local não pode ser o mesmo!');       
-        }else{  
-          Alert.alert('armazenagem iniciada');
-          navigation.navigate('Transferencia')
-        }
-      }else{
-        Alert.alert('Local invalido!');
-      }
+    if(localDataDes.data() !== undefined || localDataOrg.data() !==undefined){
+        Alert.alert('armazenagem iniciada');
+        navigation.navigate('')
     }else{
-      Alert.alert('Preencha todos os campos!');
+      Alert.alert('Local invalido');
     }
   }
+
   return (
     <View style={styles.container}>
     <View style={styles.logo}>
@@ -106,4 +99,4 @@ const styles = StyleSheet.create({
   },
 
 });
-export default Armazenagem;
+export default TransferenciaLocal;
