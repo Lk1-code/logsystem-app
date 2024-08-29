@@ -10,10 +10,10 @@ function TelaLocal({ route }) {
     async function getData() {
       try {
         const querySnapshot = await firestore()
-          .collection('Estoque')  // Acessa a coleção principal "Estoque"
-          .doc(local)             // Acessa o documento específico (passado via parâmetro)
-          .collection('Itens')    // Acessa a subcoleção "Itens" dentro do documento "local"
-          .get();
+        .collection('Estoque')
+        .doc(local)
+        .collection('itens')
+        .get();
 
         if (!querySnapshot.empty) {
           const data = querySnapshot.docs.map(doc => ({
@@ -57,8 +57,8 @@ function TelaLocal({ route }) {
         {localData.map(item => (
           <View style={styles.linha}>
           <Text style={styles.coluna_id}>{item.id} </Text>
-          <Text style={styles.coluna_produto}>{item.Produto}</Text>
-          <Text style={styles.coluna_quantidade}>{item.quantidade}</Text>
+          <Text style={styles.coluna_produto}>{item.descricao}</Text>
+          <Text style={styles.coluna_quantidade}>{item.volume}</Text>
           <Text style={styles.coluna_ean}>{item.ean}</Text>
         </View>
         ))}

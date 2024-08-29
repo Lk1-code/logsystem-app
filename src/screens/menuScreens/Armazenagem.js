@@ -5,6 +5,7 @@ import { useEffect, useState} from 'react';
 function Armazenagem({navigation}){
   const [LocalOrg,setLocalOrigem] = useState('');
   const [Localdes,setLocalDest] = useState('');
+  
   async function armaLocal(){  
     const localDataOrg = await firestore().collection('Estoque').doc(LocalOrg).get();
     const localDataDes = await firestore().collection('Estoque').doc(Localdes).get();
@@ -15,7 +16,7 @@ function Armazenagem({navigation}){
           Alert.alert('O local não pode ser o mesmo!');       
         }else{  
           Alert.alert('armazenagem iniciada');
-          navigation.navigate('Transferencia')
+          navigation.navigate('Transferencia',{local1: LocalOrg,local2:Localdes})
         }
       }else{
         Alert.alert('Local invalido!');

@@ -84,7 +84,7 @@ const App = () => {
         name="Transferencia"
         component={TransferenciaLocal}
         options={{
-          title: 'Separação',
+          headerShown: false,
         }}
       />
       <Stack.Screen
