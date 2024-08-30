@@ -1,7 +1,30 @@
-import { Text, View, StyleSheet, Image, TextInput, Pressable} from 'react-native'
-
+import { Text, View, StyleSheet, Image, TextInput, Pressable, Alert} from 'react-native'
+import firestore from '@react-native-firebase/firestore';
+import { useEffect, useState} from 'react';
 
 function Armazenagem({navigation}){
+  const [LocalOrg,setLocalOrigem] = useState('');
+  const [Localdes,setLocalDest] = useState('');
+  
+  async function armaLocal(){  
+    const localDataOrg = await firestore().collection('Estoque').doc(LocalOrg).get();
+    const localDataDes = await firestore().collection('Estoque').doc(Localdes).get();
+    //se o local existir então navega para tela do Local e salva a informação do local para
+    if(LocalOrg !== '' || Localdes !== ''){
+      if(localDataDes.data() !== undefined && localDataOrg.data() !==undefined){
+        if(LocalOrg == Localdes){
+          Alert.alert('O local não pode ser o mesmo!');       
+        }else{  
+          Alert.alert('armazenagem iniciada');
+          navigation.navigate('Transferencia',{local1: LocalOrg,local2:Localdes})
+        }
+      }else{
+        Alert.alert('Local invalido!');
+      }
+    }else{
+      Alert.alert('Preencha todos os campos!');
+    }
+  }
   return (
     <View style={styles.container}>
     <View style={styles.logo}>
@@ -14,16 +37,16 @@ function Armazenagem({navigation}){
       <Text style={styles.inputText}>Local de Origem</Text>
       <TextInput
         style={styles.input}
-        onChangeText={(text) => setUser(text)}
+        onChangeText={(text) => setLocalOrigem(text)}
       />
       <Text style={styles.inputText}>Local Destino:</Text>
       <TextInput
         style={styles.input}
-        onChangeText={(text) => setUser(text)}
+        onChangeText={(text) => setLocalDest(text)}
       />
 
     </View>
-    <Pressable style={styles.button} onPress={('#')}>
+    <Pressable style={styles.button} onPress={(armaLocal)}>
       <Text style={styles.text}>Iniciar Armazenagem</Text>
     </Pressable>
   </View>

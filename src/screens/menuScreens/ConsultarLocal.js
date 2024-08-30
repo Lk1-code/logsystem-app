@@ -6,16 +6,35 @@ import { useEffect, useState} from 'react';
 function ConsultarLocal({navigation}){
   const [LocalCons,setLocal] = useState('');
   //faz a verificação se o local existe
-  async function ConsLocal(){  
-    const localData = await firestore().collection('Estoque').doc(LocalCons).get();
-    //se o local existir então navega para tela do Local e salva a informação do local para
-    if(localData.data() !== undefined){
-      navigation.navigate("Tela Local",{local: LocalCons});
-    //caso o contrario exibe essa mensagem de erro
-    }else{
-      Alert.alert('Local invalido');
+  async function ConsLocal() {  
+    try {
+      // Fetch the collection from Firestore using the provided path
+      const localData = await firestore()
+        .collection('Estoque')
+        .doc(LocalCons)
+        .collection('itens')
+        .get();
+  
+      // Map the documents to an array of items
+      const itemList = localData.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+  
+      console.log(itemList);
+  
+      // Check if the localData contains any documents
+      if (localData.empty) {
+        Alert.alert('Local inválido');
+      } else {
+        // If the local exists, navigate to the Tela Local screen
+        navigation.navigate("Tela Local", { local: LocalCons });
+      }
+    } catch (error) {
+      // Handle any errors
+      console.error("Error fetching local data: ", error);
+      Alert.alert('Erro ao consultar local');
     }
-    
   }
   return (
     <View style={styles.container}>
