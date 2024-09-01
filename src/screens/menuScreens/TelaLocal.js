@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     justifyContent: 'center',
     alignItems: 'center',
-
   },
   title: {
     fontSize: 24,
@@ -68,58 +67,35 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   linha: {
-    fontSize: 10,
-    width: 400,
     flexDirection: 'row',
     paddingLeft: 5,
-  },
-  coluna_id: {
-    paddingTop: 10,
-    height: 50,
-    width: 40,
-    justifyContent: 'center',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    color: 'black',
-    borderWidth: 1,
-    borderColor: 'black',
-
+    borderBottomWidth: 1, // Adiciona uma linha abaixo
+    borderBottomColor: '#cccccc', // Cor da linha
+    paddingVertical: 10, // Espaço acima e abaixo do conteúdo
+    marginBottom: 5, // Espaço entre as linhas
   },
   coluna_produto: {
-    paddingTop: 10,
     height: 50,
     width: 220,
-    justifyContent: 'center',
-    textAlign: 'center',
     fontWeight: 'bold',
     color: 'black',
-    borderWidth: 1,
-    borderColor: 'black',
-
   },
   coluna_quantidade: {
-    paddingTop: 10,
-    height: 50,
     width: 30,
     justifyContent: 'center',
     textAlign: 'center',
     fontWeight: 'bold',
     color: 'black',
-    borderWidth: 1,
-    borderColor: 'black',
   },
   coluna_ean: {
-    paddingTop: 10,
-    height: 50,
-    width: 90,
+    height: 30,
+    width: 120,
     justifyContent: 'center',
-    textAlign: 'center',
+    textAlign: 'right',
     fontWeight: 'bold',
     color: 'black',
-    borderWidth: 1,
-    borderColor: 'black',
   }
-
 });
+
 
 export default TelaLocal;
