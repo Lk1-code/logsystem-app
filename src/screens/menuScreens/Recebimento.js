@@ -3,12 +3,13 @@ import { View, TextInput, Alert, StyleSheet, Pressable, Image, Text, } from 'rea
 import firestore from '@react-native-firebase/firestore';
 
 function Recebimento({ navigation }) {
+  const [LocalCons,setLocal] = useState('');
   const [placa, setPlaca] = useState('');
   const [doca, setDoca] = useState('');
   const [notaFiscal, setNotaFiscal] = useState('');
   const [localVirtual, setLocalVirtual] = useState('');
 
-  const validarCampos = async () => {
+  const ConsLocal = async () => {
     try {
       if (!placa || !doca || !notaFiscal || !localVirtual ) {
         throw new Error('Preencha todos os campos obrigatórios');
@@ -23,31 +24,41 @@ function Recebimento({ navigation }) {
         throw new Error('Local virtual inválido');
       }
 
-      await verificarDados(placa, doca, notaFiscal, localVirtual, navigation);
+      await ConsLocal(placa, doca, notaFiscal, localVirtual, navigation);
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
-  
-  
-    async function verificarDados() {
-
-      try {
-        console.log('Iniciando verificação dos dados...');
-        const recebimentoRef = await firestore().collection('Recebimento').doc(notaFiscal).get(); //aqui ele estará procurando na coleção Recebimento, o documento com id notaFiscal
-        
-        if(recebimentoRef.data() !== undefined){
-          navigation.navigate('Dashboard');
-        }else{
-          Alert.alert('Recebimento invalido');
+      //faz a verificação se o local existe
+      async function ConsLocal() {  
+        try {
+          // Fetch the collection from Firestore using the provided path
+          const localData = await firestore()
+            .collection('Recebimento')
+            .doc(LocalCons)
+            .collection('Produtos')
+            .get();
+      
+          // Map the documents to an array of items
+          const itemList = localData.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+      
+          console.log(itemList);
+      
+          // Check if the localData contains any documents
+          if (localData.empty) {
+            Alert.alert('Produto inválido');
+          } else {
+            // If the local exists, navigate to the Tela Local screen
+            navigation.navigate("Dashboard", { local: LocalCons });
+          }
+        } catch (error) {
+          // Handle any errors
+          console.error("Error fetching local data: ", error);
+          Alert.alert('Erro ao consultar Produto');
         }
-
-        console.log(recebimentoRef.data());
-    
-      } catch (error) {
-        console.error('Erro ao verificar dados:', error);
-        Alert.alert('Erro', 'Erro ao acessar o banco de dados. Por favor, tente novamente mais tarde.');
       }
-    }
   }
   return (
     <View style={styles.container}>
@@ -70,16 +81,20 @@ function Recebimento({ navigation }) {
   />
   <Text style={styles.inputText}>Nota-Fiscal:</Text>
   <TextInput
-    style={styles.input}
-    onChangeText={(text) => setNotaFiscal(text)}
-  />
+        value={LocalCons}
+        style={styles.input}
+        onChangeText={(text) => {
+          setNotaFiscal(text);
+          setLocal(text);
+        }}
+      />
   <Text style={styles.inputText}>Local-Virtual:</Text>
   <TextInput
     style={styles.input}
     onChangeText={(text) => setLocalVirtual(text)}
   />
 </View>
-<Pressable style={styles.button} onPress={validarCampos}>
+<Pressable style={styles.button} onPress={ConsLocal}>
   <Text style={styles.text}>Iniciar Recebimento</Text>
 </Pressable>
   </View>
