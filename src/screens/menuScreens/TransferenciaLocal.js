@@ -28,10 +28,15 @@ function TransferenciaLocal({ route, navigation }) {
         <Text style={styles.text}>Voltar</Text>
       </Pressable>
       {/* Exibir dados locais */}
+      <View style={styles.linha}>
+          <Text style={styles.coluna_produto}>Produto</Text>
+          <Text style={styles.coluna_quantidade}>Qtd</Text>
+          <Text style={styles.coluna_ean}>Ean</Text>
+        </View>
       {localData.map(item => (
         <View style={styles.linha} key={item.id}>
           <Text style={styles.coluna_produto}>{item.descricao}</Text>
-          <Text style={styles.coluna_quantidade}>{item.volume}</Text>
+          <Text style={styles.coluna_quantidade}>{1}</Text>
           <Text style={styles.coluna_ean}>{item.ean}</Text>
         </View>
       ))}
@@ -51,7 +56,8 @@ const styles = StyleSheet.create({
     fontWeight:'bold',
   },
   Local:{
-    fontSize: 20,
+    marginLeft:5,
+    fontSize: 18,
     color:'black',
     fontWeight:'bold',
     marginBottom: 5,
@@ -72,8 +78,9 @@ const styles = StyleSheet.create({
     
   },
   input: {
-    width: 400,
+    width: 380,
     height:40,
+    marginLeft:5,
     padding: 5,
     marginTop:5,
     marginBottom: 20,
@@ -92,7 +99,8 @@ const styles = StyleSheet.create({
     borderRadius:5,
     elevation: 10,
     shadowColor: '#000000',
-    marginBottom:20,
+    marginBottom:10,
+    marginLeft:5,
   },
   text: {
     fontSize: 16,
@@ -100,40 +108,35 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 0.25,
     color: '#000000',
-  },linha:{
-    fontSize:10,
-    width:400,
-    flexDirection:'row',
-    paddingLeft:5,
+  },  
+  linha: {
+    flexDirection: 'row',
+    paddingLeft: 5,
+    borderBottomWidth: 1, // Adiciona uma linha abaixo
+    borderBottomColor: '#cccccc', // Cor da linha
+    paddingVertical: 10, // Espaço acima e abaixo do conteúdo
+    marginBottom: 5, // Espaço entre as linhas
   },
-  coluna_produto:{
-    paddingTop:10,
-    height:30,
-    width:250,
-    justifyContent: 'center',
-    textAlign:'center',
-    fontWeight:'bold',
-    color:'black',
-
+  coluna_produto: {
+    height: 50,
+    width: 220,
+    fontWeight: 'bold',
+    color: 'black',
   },
-  coluna_quantidade:{
-    paddingTop:10,
-    height:30,
-    width:40,
+  coluna_quantidade: {
+    width: 30,
     justifyContent: 'center',
-    textAlign:'center',
-    fontWeight:'bold',
-    color:'black',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: 'black',
   },
-  coluna_ean:{
-    paddingTop:10,
-    height:30,
-    width:110,
+  coluna_ean: {
+    height: 30,
+    width: 120,
     justifyContent: 'center',
-    textAlign:'center',
-    fontWeight:'bold',
-    color:'black',
-
+    textAlign: 'right',
+    fontWeight: 'bold',
+    color: 'black',
   }
 
 });

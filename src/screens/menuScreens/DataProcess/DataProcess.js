@@ -2,6 +2,7 @@ import { Alert } from 'react-native'
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
+//função da tela de Login
 export const handleLogin = (email, Password, navigation) => {
     //Verifica caso os campos estejam vazios
     if (email === "") {
@@ -56,7 +57,7 @@ export async function ConsLocal(local, navigation = null) {
         return [];
     }
 }
-
+//função da tela de armazenagem
 export async function transferirDados(localOrigem, localDestino, ean = null, setLocalData, navigation = null) {
     if (localOrigem === '' || localDestino === '') {
         Alert.alert('Preencha todos os campos!');
@@ -94,32 +95,69 @@ export async function transferirDados(localOrigem, localDestino, ean = null, set
 
         if (documentoOrigem.exists) {
             const dadosOrigem = documentoOrigem.data();
-            
+
             // Atualiza o estado localmente
             setLocalData(prevData => [
                 ...prevData,
                 { id: ean, ...dadosOrigem },
             ]);
 
-            // Transfere os dados no banco
-            await firestore()
+            // Verifica se o EAN já existe no local de destino
+            const documentoDestino = await firestore()
                 .collection('Estoque')
                 .doc(localDestino)
                 .collection('itens')
                 .doc(ean)
-                .set(dadosOrigem);
+                .get();
+
+            if (documentoDestino.exists) {
+                // Se o EAN já existe no local de destino, incrementa o volume
+                await firestore()
+                    .collection('Estoque')
+                    .doc(localDestino)
+                    .collection('itens')
+                    .doc(ean)
+                    .update({
+                        volume: firestore.FieldValue.increment(1) // Incrementa o volume em 1 no destino
+                    });
+            } else {
+                // Se o EAN não existe no destino, cria um novo documento com volume inicial
+                await firestore()
+                    .collection('Estoque')
+                    .doc(localDestino)
+                    .collection('itens')
+                    .doc(ean)
+                    .set({
+                        ...dadosOrigem,
+                        volume: 1 // Define o volume inicial como 1
+                    });
+            }
 
             console.log('Dados transferidos com sucesso!');
 
-            // Deleta os dados do documento de origem
-            await firestore()
+            // Atualiza o volume do local de origem
+            const origemRef = firestore()
                 .collection('Estoque')
                 .doc(localOrigem)
                 .collection('itens')
-                .doc(ean)
-                .delete();
+                .doc(ean);
 
-            console.log('Documento de origem deletado com sucesso!');
+            await origemRef.update({
+                volume: firestore.FieldValue.increment(-1) // Decrementa o volume em 1 na origem
+            });
+
+            // Pega o volume atualizado após o decremento
+            const documentoOrigemAtualizado = await origemRef.get();
+            const novoVolume = documentoOrigemAtualizado.data().volume;
+
+            // Se o volume for zero, deleta o documento
+            if (novoVolume <= 0) {
+                await origemRef.delete();
+                console.log('Documento de origem deletado porque o volume chegou a zero ou ficou negativo!');
+            } else {
+                console.log('Documento de origem atualizado com sucesso!');
+            }
+
         } else {
             Alert.alert('EAN não está no Local');
         }
