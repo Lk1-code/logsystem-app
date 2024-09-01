@@ -60,7 +60,7 @@ const App = () => {
         }}
       />
       <Stack.Screen
-        name="Tela Local"
+        name="TelaLocal"
         component={TelaLocal}
         options={{
           title: 'Local',
