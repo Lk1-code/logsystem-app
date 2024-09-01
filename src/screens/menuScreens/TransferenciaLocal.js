@@ -1,84 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Image, Pressable, StyleSheet } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, Image, Pressable, StyleSheet,Keyboard  } from 'react-native';
+import { transferirDados } from './DataProcess/DataProcess'; // Ajuste o caminho conforme necessário
 
 function TransferenciaLocal({ route, navigation }) {
   const [localData, setLocalData] = useState([]);
   const { local1, local2 } = route.params;
-  const [IdEan, setEan] = useState('');
-
-  async function getData() {
-    try {
-      // Pega os dadtos do local de origem
-      const documentoOrigem = await firestore()
-        .collection('Estoque')
-        .doc(local1)
-        .collection('itens')
-        .doc(IdEan)
-        .get();
-
-      // função para armazenar localmente a trasnferencia
-      if (documentoOrigem.exists) {
-        const dadosOrigem = documentoOrigem.data();
-        setLocalData(prevData => [
-          ...prevData,
-          { id: IdEan, ...dadosOrigem },
-        ]);
-
-        //trasnfere os dados no banco
-        await firestore()
-          .collection('Estoque')
-          .doc(local2)
-          .collection('itens')
-          .doc(IdEan)
-          .set(dadosOrigem);
-
-        console.log('Dados transferidos com sucesso!');
-
-        //deleta os dados do documento origem
-        await firestore()
-          .collection('Estoque')
-          .doc(local1)
-          .collection('itens')
-          .doc(IdEan)
-          .delete();
-
-        console.log('Documento de origem deletado com sucesso!');
-      } else {
-        console.log('Documento de origem não encontrado');
-      }
-    } catch (error) {
-      console.error('Erro ao transferir os dados:', error);
-    }
-  }
+  const [ean, setEan] = useState('');
 
   return (
     <View style={styles.container}>
       <View style={styles.logo}>
         <Image source={require('../../images/armazenagem.png')} />
-        <Text style={styles.title}>Armazenagem</Text>
+        <Text style={styles.title}>Transferência de Itens</Text>
       </View>
       <Text style={styles.Local}>Local Origem: {local1}</Text>
       <Text style={styles.Local}>Local Destino: {local2}</Text>
       <View style={styles.forms}>
         <TextInput
-          value={IdEan}
+          value={ean}
           placeholder='Insira o EAN do produto'
           style={styles.input}
           onChangeText={text => setEan(text)}
-          onSubmitEditing={getData}
+          onSubmitEditing={() => transferirDados(local1, local2, ean, setLocalData)}
         />
       </View>
       <Pressable style={styles.button} onPress={() => navigation.navigate('Armazenagem')}>
         <Text style={styles.text}>Voltar</Text>
       </Pressable>
-      <View>
-        <View style={styles.linha}>
-          <Text style={styles.coluna_produto}>Produto</Text>
-          <Text style={styles.coluna_quantidade}>Qtd</Text>
-          <Text style={styles.coluna_ean}>Ean</Text>
-        </View>
-      </View>
+      {/* Exibir dados locais */}
       {localData.map(item => (
         <View style={styles.linha} key={item.id}>
           <Text style={styles.coluna_produto}>{item.descricao}</Text>
@@ -89,7 +38,6 @@ function TransferenciaLocal({ route, navigation }) {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
