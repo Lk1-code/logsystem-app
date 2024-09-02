@@ -1,46 +1,31 @@
-import { Text, View, StyleSheet, Image, TextInput, Pressable, Alert} from 'react-native'
-import firestore from '@react-native-firebase/firestore';
-import { useEffect, useState} from 'react';
+import { Text, View, StyleSheet, Image, TextInput, Pressable, Alert } from 'react-native';
+import { useState } from 'react';
+import { ConsLocal } from './DataProcess/DataProcess'; // Certifique-se de que o caminho está correto
 
+function ConsultarLocal({ navigation }) { // Recebe o navigation como prop
+  const [LocalCons, setLocal] = useState('');
 
-
-function ConsultarLocal({navigation}){
-  const [localOrigem,setLocal] = useState('');
-  //faz a verificação se o local existe
-  async function  ConsLocal(){  
-    const localData = await firestore().collection('Estoque').doc(localOrigem).get();
-    //se o local existir então navega para tela do Local
-    if(localData.data() !== undefined){
-      console.log(localData.data());
-      navigation.navigate("Tela Local")
-    //caso o contrario exibe essa mensagem de erro
-    }else{
-      Alert.alert('Local invalido')
-    }
-    
-  }
   return (
     <View style={styles.container}>
-    <View style={styles.logo}>
-      <Image
-        source={require('../../images/Consulta.png')}
-      />
-      <Text style={styles.title}>Consultar Local</Text>
-    </View>  
-    <View style = {styles.forms}>  
-      <Text style={styles.inputText}>Local de Origem</Text>
-      <TextInput
-        value={localOrigem}
-        style={styles.input}
-        onChangeText={(text) => setLocal(text)}
-      />
+      <View style={styles.logo}>
+        <Image source={require('../../images/Consulta.png')} />
+        <Text style={styles.title}>Consultar Local</Text>
+      </View>
+      <View style={styles.forms}>
+        <Text style={styles.inputText}>Local de Origem</Text>
+        <TextInput
+          value={LocalCons}
+          style={styles.input}
+          onChangeText={(text) => setLocal(text)}
+        />
+      </View>
+      <Pressable style={styles.button} onPress={() => ConsLocal(LocalCons, navigation)}>
+        <Text style={styles.text}>Consultar Local</Text>
+      </Pressable>
     </View>
-    <Pressable style={styles.button} onPress={ConsLocal}>
-      <Text style={styles.text}>Iniciar Armazenagem</Text>
-    </Pressable>
-  </View>
-    )
+  );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
