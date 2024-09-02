@@ -35,7 +35,7 @@ function Recebimento({ navigation }) {
           const localData = await firestore()
             .collection('Recebimento')
             .doc(LocalCons)
-            .collection('Produtos')
+            .collection('Itens')
             .get();
       
           // Map the documents to an array of items
