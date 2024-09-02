@@ -1,35 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, Image, TextInput, Pressable, Alert} from 'react-native'
-import firestore from '@react-native-firebase/firestore';
+import { Text, View, StyleSheet, Image, TextInput, Pressable, Alert } from 'react-native'
+import { ConsLocal } from './DataProcess/DataProcess';
 
 function TelaLocal({ route }) {
   const [localData, setLocalData] = useState([]);
-  const { local } = route.params; //obtem a variavel do local armazenada na tela anterior
+  const { local } = route.params;
 
   useEffect(() => {
-    async function getData() {
+    // Função para buscar dados do Firestore
+    const fetchData = async () => {
       try {
-        const querySnapshot = await firestore()
-        .collection('Estoque')
-        .doc(local)
-        .collection('itens')
-        .get();
-
-        if (!querySnapshot.empty) {
-          const data = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setLocalData(data); // Armazena os dados do Local na Variavel
-        } else {
-          console.log('Nenhum item encontrado na subcoleção');
-        }
+        const data = await ConsLocal(local); // Chama a função para buscar dados
+        setLocalData(data); // Armazena os dados obtidos no estado
       } catch (error) {
-        console.error('Erro ao buscar dados do Firestore: ', error);
+        console.error('Erro ao buscar dados: ', error);
+        Alert.alert('Erro', 'Não foi possível buscar os dados.');
       }
-    }
+    };
 
-    getData();
+    fetchData(); // Chama a função de busca de dados
   }, [local]);
 
   //verifica se ha dados na coleção
@@ -42,97 +31,71 @@ function TelaLocal({ route }) {
   }
 
   return (
-    
+
     <View>
       <View style={styles.container}>
-          <Text style={styles.title}>Local: {local}</Text>     
+        <Text style={styles.title}>Local: {local}</Text>
       </View>
       <View>
         <View style={styles.linha}>
-          <Text style={styles.coluna_id}>ID</Text>
           <Text style={styles.coluna_produto}>Produto</Text>
           <Text style={styles.coluna_quantidade}>Qtd</Text>
           <Text style={styles.coluna_ean}>Ean</Text>
         </View>
         {localData.map(item => (
           <View style={styles.linha}>
-          <Text style={styles.coluna_id}>{item.id} </Text>
-          <Text style={styles.coluna_produto}>{item.descricao}</Text>
-          <Text style={styles.coluna_quantidade}>{item.volume}</Text>
-          <Text style={styles.coluna_ean}>{item.ean}</Text>
-        </View>
+            <Text style={styles.coluna_produto}>{item.descricao}</Text>
+            <Text style={styles.coluna_quantidade}>{item.volume}</Text>
+            <Text style={styles.coluna_ean}>{item.ean}</Text>
+          </View>
         ))}
       </View>
     </View>
-    
+
   );
 }
-  const styles = StyleSheet.create({
-    container: {
-      margin:30,
-      backgroundColor: '#f0f0f0',
-      justifyContent: 'center',
-      alignItems: 'center',
-      
-    },
-    title: {
-      fontSize: 24,
-      color:'black',
-      fontWeight:'bold',
-    },
-    linha:{
-      fontSize:10,
-      width:400,
-      flexDirection:'row',
-      paddingLeft:5,
-    },
-    coluna_id:{
-      paddingTop:10,
-      height:50,
-      width:40,
-      justifyContent: 'center',
-      textAlign:'center',
-      fontWeight:'bold',
-      color:'black',
-      borderWidth: 1,
-      borderColor: 'black',
-      
-    },
-    coluna_produto:{
-      paddingTop:10,
-      height:50,
-      width:220,
-      justifyContent: 'center',
-      textAlign:'center',
-      fontWeight:'bold',
-      color:'black',
-      borderWidth: 1,
-      borderColor: 'black',
+const styles = StyleSheet.create({
+  container: {
+    margin: 30,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  linha: {
+    flexDirection: 'row',
+    paddingLeft: 5,
+    borderBottomWidth: 1, // Adiciona uma linha abaixo
+    borderBottomColor: '#cccccc', // Cor da linha
+    paddingVertical: 10, // Espaço acima e abaixo do conteúdo
+    marginBottom: 5, // Espaço entre as linhas
+  },
+  coluna_produto: {
+    height: 50,
+    width: 220,
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  coluna_quantidade: {
+    width: 30,
+    justifyContent: 'center',
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: 'black',
+  },
+  coluna_ean: {
+    height: 30,
+    width: 120,
+    justifyContent: 'center',
+    textAlign: 'right',
+    fontWeight: 'bold',
+    color: 'black',
+  }
+});
 
-    },
-    coluna_quantidade:{
-      paddingTop:10,
-      height:50,
-      width:30,
-      justifyContent: 'center',
-      textAlign:'center',
-      fontWeight:'bold',
-      color:'black',
-      borderWidth: 1,
-      borderColor: 'black',
-    },
-    coluna_ean:{
-      paddingTop:10,
-      height:50,
-      width:90,
-      justifyContent: 'center',
-      textAlign:'center',
-      fontWeight:'bold',
-      color:'black',
-      borderWidth: 1,
-      borderColor: 'black',
-    }
-  
-  });
 
 export default TelaLocal;
