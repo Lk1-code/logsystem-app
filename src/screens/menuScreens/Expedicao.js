@@ -1,39 +1,102 @@
-import { Text, View, StyleSheet, Image, TextInput, Pressable} from 'react-native'
+import React, { useState } from 'react';
+import { View, TextInput, Alert, StyleSheet, Pressable, Image, Text, } from 'react-native';
+import firestore from '@react-native-firebase/firestore';
 
-function Expedicao({navigation}){
+function Expedicao({ navigation }) {
+  const [LocalCons,setLocal] = useState('');
+  const [placa, setPlaca] = useState('');
+  const [doca, setDoca] = useState('');
+  const [notaFiscal, setNotaFiscal] = useState('');
+  const [localVirtual, setLocalVirtual] = useState('');
+
+  const ConsLocal = async () => {
+    try {
+      if (!placa || !doca || !notaFiscal || !localVirtual ) {
+        throw new Error('Preencha todos os campos obrigatórios');
+      }
+      if (placa == '') {
+        throw new Error('Placa do caminhão inválida');
+      }
+      if (notaFiscal == '') {
+        throw new Error('Nota fiscal inválida');
+      }
+      if (localVirtual == '') {
+        throw new Error('Local virtual inválido');
+      }
+
+      await ConsLocal(placa, doca, notaFiscal, localVirtual, navigation);
+    } catch (error) {
+      Alert.alert('Erro', error.message);
+    }
+      //faz a verificação se o local existe
+      async function ConsLocal() {  
+        try {
+          // Fetch the collection from Firestore using the provided path
+          const localData = await firestore()
+          .collection('Estoque')
+          .doc(LocalCons)
+          .collection('Produtos')
+          .get();
+      
+          // Map the documents to an array of items
+          const itemList = localData.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+      
+          console.log(itemList);
+      
+          // Check if the localData contains any documents
+          if (localData.empty) {
+            Alert.alert('Produto inválido');
+          } else {
+            // If the local exists, navigate to the Tela Local screen
+            navigation.navigate("ExpedicaoDetails", { local: LocalCons });
+          }
+        } catch (error) {
+          // Handle any errors
+          console.error("Error fetching local data: ", error);
+          Alert.alert('Erro ao consultar Produto');
+        }
+      }
+  }
   return (
     <View style={styles.container}>
     <View style={styles.logo}>
       <Image
-        source={require('../../images/expedicao.png')}
+        source={require('../../images/rec.png')}
       />
       <Text style={styles.title}>Expedição</Text>
     </View>  
-    <View style = {styles.forms}>  
-      <Text style={styles.inputText}>Placa do Caminhão:</Text>
-      <TextInput
+    <View style={styles.forms}>  
+  <Text style={styles.inputText}>Placa do Caminhão:</Text>
+  <TextInput
+    style={styles.input}
+    onChangeText={(text) => setPlaca(text)}
+  />
+  <Text style={styles.inputText}>Doca:</Text>
+  <TextInput
+    style={styles.input}
+    onChangeText={(text) => setDoca(text)}
+  />
+  <Text style={styles.inputText}>Nota-Fiscal:</Text>
+  <TextInput
+        value={LocalCons}
         style={styles.input}
-        onChangeText={(text) => setUser(text)}
+        onChangeText={(text) => {
+          setNotaFiscal(text);
+          setLocal(text);
+        }}
       />
-      <Text style={styles.inputText}>Doca:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setUser(text)}
-      />
-      <Text style={styles.inputText}>Nota-Fiscal:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setUser(text)}
-      />
-      <Text style={styles.inputText}>Local-Virtual:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setPassword(text)}
-      />
-    </View>
-    <Pressable style={styles.button} onPress={() => navigation.navigate('')}>
-      <Text style={styles.text}>Iniciar Carregamento</Text>
-    </Pressable>
+  <Text style={styles.inputText}>Local-Virtual:</Text>
+  <TextInput
+    style={styles.input}
+    onChangeText={(text) => setLocalVirtual(text)}
+  />
+</View>
+<Pressable style={styles.button} onPress={ConsLocal}>
+  <Text style={styles.text}>Iniciar Caregamento</Text>
+</Pressable>
   </View>
     )
 }

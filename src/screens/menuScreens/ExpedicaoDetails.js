@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
+import Expedicao from './Expedicao';
 
-function Dashboard({ navigation, route }) {
-  const [recebimentos, setRecebimentos] = useState([]);
+function ExpedicaoDetails({ navigation, route }) {
   const [localData, setLocalData] = useState([]);
   const [destinoEstoque, setDestinoEstoque] = useState(''); // Estado para o local atual a ser adicionado
   const [destinos, setDestinos] = useState([]); // Estado para armazenar múltiplos destinos
@@ -272,4 +272,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Dashboard;
+export default ExpedicaoDetails;
