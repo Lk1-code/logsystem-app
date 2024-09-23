@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 
 function Dashboard({ navigation, route }) {
-  const [recebimentos, setRecebimentos] = useState([]);
   const [localData, setLocalData] = useState([]);
-  const [destinoEstoque, setDestinoEstoque] = useState(''); // Estado para o local atual a ser adicionado
-  const [destinos, setDestinos] = useState([]); // Estado para armazenar múltiplos destinos
-  const { local } = route.params; // Obtem a variável do local armazenada na tela anterior
+  const [destinoEstoque, setDestinoEstoque] = useState('');
+  const [destinos, setDestinos] = useState([]);
+  const { local, notaFiscal } = route.params;
 
   useEffect(() => {
-    async function getData() {
+    const getData = async () => {
       try {
         const querySnapshot = await firestore()
           .collection('Recebimento')
           .doc(local)
           .collection('Produtos')
+          .where('ean', '==', notaFiscal)
           .get();
 
         if (!querySnapshot.empty) {
@@ -23,76 +23,75 @@ function Dashboard({ navigation, route }) {
             id: doc.id,
             ...doc.data(),
           }));
-          setLocalData(data); // Armazena os dados do Local na variável
+          setLocalData(data);
         } else {
-          console.log('Nenhum item encontrado na subcoleção');
+          Alert.alert('Nenhum item encontrado', 'Nenhum item encontrado para essa nota fiscal.');
         }
       } catch (error) {
         console.error('Erro ao buscar dados do Firestore: ', error);
+        Alert.alert('Erro', 'Não foi possível carregar os dados.');
       }
-    }
+    };
 
     getData();
-  }, [local]);
+  }, [local, notaFiscal]);
 
-  // Função para cancelar e voltar para a tela anterior
   const handleCancel = () => {
     navigation.goBack();
   };
 
-  // Função para adicionar o destino à lista de destinos
   const handleAddDestino = () => {
     if (!destinoEstoque) {
-      alert('Por favor, insira um local de destino.');
+      Alert.alert('Atenção', 'Por favor, insira um local de destino.');
       return;
     }
-    setDestinos([...destinos, destinoEstoque]); // Adiciona o destino à lista
-    setDestinoEstoque(''); // Limpa o campo de entrada após adicionar
+    if (destinos.includes(destinoEstoque)) {
+      Alert.alert('Atenção', 'Este local já foi adicionado.');
+      return;
+    }
+    setDestinos([...destinos, destinoEstoque]);
+    setDestinoEstoque('');
   };
 
-  // Função para finalizar e mover os dados para os locais especificados na coleção 'Estoque'
   const handleFinalize = async () => {
     if (destinos.length === 0) {
-      alert('Por favor, adicione pelo menos um local de destino para armazenar os dados.');
+      Alert.alert('Atenção', 'Por favor, adicione pelo menos um local de destino.');
       return;
     }
 
     try {
       const batch = firestore().batch();
 
-      // Percorre cada item do localData e adiciona a cada destino especificado
       localData.forEach(item => {
         destinos.forEach(destino => {
           const estoqueRef = firestore().doc(`Estoque/${destino}/Produtos/${item.id}`);
-          batch.set(estoqueRef, item); // Adiciona cada item em cada destino especificado na coleção 'Estoque'
+          batch.set(estoqueRef, item);
         });
       });
 
-      // Executa a operação em lote
       await batch.commit();
       console.log('Dados transferidos para Estoque com sucesso!');
 
-      // Apagar os dados da coleção 'Recebimento' após transferir
-      await firestore()
+      const querySnapshot = await firestore()
         .collection('Recebimento')
         .doc(local)
         .collection('Produtos')
-        .get()
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            doc.ref.delete();
-          });
-        });
+        .get();
 
-      alert('Recebimento finalizado com sucesso!');
-      navigation.goBack(); // Volta para a tela anterior após finalizar
+      const deleteBatch = firestore().batch();
+      querySnapshot.forEach(doc => {
+        deleteBatch.delete(doc.ref);
+      });
+      await deleteBatch.commit();
+
+      Alert.alert('Sucesso', 'Recebimento finalizado com sucesso!');
+      navigation.goBack();
     } catch (error) {
       console.error('Erro ao finalizar recebimento: ', error);
-      alert('Erro ao finalizar recebimento. Tente novamente.');
+      Alert.alert('Erro', 'Erro ao finalizar recebimento. Tente novamente.');
     }
   };
 
-  // Verifica se há dados na coleção
   if (localData.length === 0) {
     return (
       <View>
@@ -106,6 +105,7 @@ function Dashboard({ navigation, route }) {
       <View>
         <View style={styles.container}>
           <Text style={styles.title}>Recebimento: {local}</Text>
+          <Text style={styles.subtitle}>Nota Fiscal: {notaFiscal}</Text>
         </View>
         <View>
           <View style={styles.linha}>
@@ -124,7 +124,6 @@ function Dashboard({ navigation, route }) {
           ))}
         </View>
 
-        {/* Campo de entrada e botão para adicionar destino */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
@@ -137,14 +136,12 @@ function Dashboard({ navigation, route }) {
           </TouchableOpacity>
         </View>
 
-        {/* Exibição dos destinos adicionados */}
         <View style={styles.destinosContainer}>
           {destinos.map((destino, index) => (
             <Text key={index} style={styles.destinoText}>{destino}</Text>
           ))}
         </View>
 
-        {/* Botões Cancelar e Finalizar */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
             <Text style={styles.buttonText}>Cancelar</Text>
@@ -170,9 +167,14 @@ const styles = StyleSheet.create({
     color: 'black',
     fontWeight: 'bold',
   },
+  subtitle: {
+    fontSize: 18,
+    color: 'black',
+    marginTop: 5,
+  },
   linha: {
     fontSize: 10,
-    width: 400,
+    width: '100%',
     flexDirection: 'row',
     paddingLeft: 5,
   },
